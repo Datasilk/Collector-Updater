@@ -1,4 +1,19 @@
 {
-  "Api": "http://192.168.0.200",
-  "Version": ""
+  "Api": "http://localhost:5146",
+  "Version": "0.1",
+  "InstallPath": "C:\\Collector\\",
+  "Apps": [
+    {
+      "Name": "collector",
+      "Port": ""
+    },
+    {
+      "Name": "charlotte",
+      "Port": "5007"
+    },
+    {
+      "Name": "charlottes-web",
+      "Port": "5005"
+    }
+  ]
 }

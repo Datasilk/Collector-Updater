@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Net;
 using System.Net.Http;
+using Updater.Models;
 
 namespace Updater
 {
@@ -10,7 +11,7 @@ namespace Updater
         private readonly ILogger<Worker> _logger;
         private int Delay { get; set; } = 15; // in minutes
         private string ApiUri { get; set; } = "http://192.168.0.200";
-        private AppSettings Settings { get; set; }
+        private Config Config { get; set; } = new Config();
 
         public Worker(ILogger<Worker> logger)
         {
@@ -19,10 +20,15 @@ namespace Updater
             if (File.Exists(App.MapPath("config.json")))
             {
                 var config = File.ReadAllText(App.MapPath("config.json"));
-                Settings = JsonSerializer.Deserialize<AppSettings>(config) ?? new AppSettings();
-                if(Settings.Api == "")
+                Config = JsonSerializer.Deserialize<Config>(config) ?? new Config();
+                App.Config = Config;
+                if(Config.Api == "")
                 {
                     _logger.LogInformation("{time}: Error getting Api Uri from config.json", DateTimeOffset.Now);
+                }
+                if (!Directory.Exists(App.Config.InstallPath))
+                {
+                    Directory.CreateDirectory(App.Config.InstallPath);
                 }
             }
         }
@@ -33,16 +39,46 @@ namespace Updater
             {
                 //check for version update
                 var request = new HttpClient();
-                var response = request.GetAsync(Settings.Api).Result;
+                var response = request.GetAsync(Config.Api + "/Version").Result;
                 if(response != null)
                 {
-                    var v = response.Content.ToString();
-                    if(v != Settings.Version)
+                    var oldv = Config.Version;
+                    string v = response.Content.ReadAsStringAsync().Result;
+                    if(v != Config.Version)
                     {
-                        Settings.Version = v;
-                        _logger.LogInformation("{time}: Version changed from " + Settings.Version + " to " + v, DateTimeOffset.Now);
+                        //////////////////////////////////////////////////////////////
+                        //update configured software
+                        //////////////////////////////////////////////////////////////
+                        App.Config.Version = Config.Version = v;
+                        //save config file
+                        File.WriteAllText(App.MapPath("config.json"), JsonSerializer.Serialize(App.Config, new JsonSerializerOptions()
+                        {
+                            WriteIndented = true
+                        }));
+                        foreach(var app in Config.Apps)
+                        {
+                            Update updater = null;
+                            switch (app.Name.ToLower())
+                            {
+                                case "collector":
+                                    updater = new Updaters.CollectorApp();
+                                    break;
+                                case "charlotte":
+                                    updater = new Updaters.CharlotteApp();
+                                    break;
+                                case "charlottes-web":
+                                    updater = new Updaters.CharlottesWebApp();
+                                    break;
+                            }
+                            if(updater != null)
+                            {
+                                _logger.LogInformation("{time}: running updater for " + app.Name, DateTimeOffset.Now);
+                                updater.Run();
+                            }
+                        }
+
+                        _logger.LogInformation("{time}: Version changed from " + oldv + " to " + v, DateTimeOffset.Now);
                     }
-                    
                 }
                 else
                 {

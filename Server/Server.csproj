@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\releases\" />
+    <Folder Include="wwwroot\releases\collector\" />
+    <Folder Include="wwwroot\releases\charlotte\" />
+    <Folder Include="wwwroot\releases\charlottes-web\" />
   </ItemGroup>
 
 </Project>

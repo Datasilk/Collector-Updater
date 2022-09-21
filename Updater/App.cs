@@ -14,7 +14,7 @@ namespace Updater
     {
         public static Environment Environment { get; set; } = Environment.development;
         public static bool IsDocker { get; set; }
-
+        public static Models.Config Config { get; set; } = new Models.Config();
         private static string _rootPath { get; set; } = "";
 
         public static string RootPath
