@@ -1,0 +1,65 @@
+﻿
+@{
+    ViewData["Title"] = "Upload A New Version";
+}
+@model Server.Models.Upload;
+<html>
+    <head>
+        <style type="text/css">
+            .row, .col {position: relative; vertical-align: top;}
+            .row:after {visibility: hidden;display: block;font-size: 0;content: " ";clear: both;height: 0;}
+            .row {width: 100%;box-sizing: border-box;line-height: 0;}
+            .col {float: left;width: auto;box-sizing: border-box;display: inline-block;*margin-right: -1px;line-height: 1;}
+            .col.field {text-align: rightwidth: 100px;padding: 9px 7px 15px 4px;margin-top: 4px;}
+            .col.input {padding: 6px 7px 3px 0px;}
+            .text-right {text-align: right;}
+            input:not([type=button]):not([type=submit]):not([type=checkbox]):not([type=radio]),
+            input:not([type=button]):not([type=submit]):not([type=checkbox]):not([type=radio]),
+            select {font-size: 15px;padding: 0 5px 0 10px;line-height: 1.95;height: 35px}
+
+            .upload-form{width:100%; max-width:300px; margin:50px auto 0 auto; position:relative; overflow:hidden;}
+        </style>
+    </head>
+    <body>
+        <div class="upload-form">
+            <form method="post" enctype="multipart/form-data">
+                @if(Model.Error != "")
+                {
+                    <div class="message error">@Html.Raw(Model.Error)</div>
+                }
+                @if(Model.Message != "")
+                {
+                    <div class="message">@Html.Raw(Model.Message)</div>
+                }
+                <div class="row">
+                    <div class="col field">Zip file</div>
+                    <div class="col input"><input type="file" name="File" /></div>
+                </div>
+                <div class="row">
+                    <div class="col field">App</div>
+                    <div class="col input">
+                        <select name="App">
+                            <option value="collector">Collector</option>
+                            <option value="charlotte">Charlotte</option>
+                            <option value="charlottes-web">Charlotte's Web</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col field">Version</div>
+                    <div class="col input"><input type="text" name="Version" value="1.0" style="width:75px" /></div>
+                </div>
+                <div class="row text-right">
+                    <input type="submit" value="Upload" onclick="upload()" />
+                </div>
+            </form>
+        </div>
+    </body>
+
+    <script>
+        function upload() {
+            document.getElementsByClassName('upload-form')[0].style.height = '0px';
+        }
+    </script>
+</html>
+

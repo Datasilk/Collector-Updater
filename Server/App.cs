@@ -14,7 +14,7 @@ namespace Server
     {
         public static Environment Environment { get; set; } = Environment.development;
         public static bool IsDocker { get; set; }
-        public static Models.Config Settings { get; set; } = new Models.Config();
+        public static Models.Config Config { get; set; } = new Models.Config();
 
         private static string _rootPath { get; set; } = "";
 

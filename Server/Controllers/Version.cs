@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace Server.Controllers
 {
@@ -16,7 +17,7 @@ namespace Server.Controllers
         [HttpGet]
         public string Get()
         {
-            return App.Settings.Version;
+            return JsonSerializer.Serialize(App.Config.Apps);
         }
     }
 }

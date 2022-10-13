@@ -1,19 +1,21 @@
 {
   "Api": "http://localhost:5146",
-  "Version": "0.1",
   "InstallPath": "C:\\Collector\\",
   "Apps": [
     {
       "Name": "collector",
-      "Port": ""
+      "Port": "7070",
+      "Version": "0.1"
     },
     {
       "Name": "charlotte",
-      "Port": "5007"
+      "Port": "7701",
+      "Version": "0.1"
     },
     {
       "Name": "charlottes-web",
-      "Port": "5005"
+      "Port": "7700",
+      "Version": "0.1"
     }
   ]
 }

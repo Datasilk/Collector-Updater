@@ -2,6 +2,12 @@
 {
     public class Config
     {
-        public string Version { get; set; }
+        public List<AppVersion> Apps { get; set; } = new List<AppVersion>();
+    }
+
+    public class AppVersion
+    {
+        public string Name { get; set; } = "";
+        public string Version { get; set; } = "";
     }
 }

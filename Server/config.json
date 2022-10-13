@@ -1,3 +1,16 @@
 {
-  "Version": "0.1"
+  "Apps": [
+    {
+      "Name": "collector",
+      "Version": "0.1"
+    },
+    {
+      "Name": "charlotte",
+      "Version": "0.1"
+    },
+    {
+      "Name": "charlottes-web",
+      "Version": "0.1"
+    }
+  ]
 }

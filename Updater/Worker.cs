@@ -42,42 +42,48 @@ namespace Updater
                 var response = request.GetAsync(Config.Api + "/Version").Result;
                 if(response != null)
                 {
-                    var oldv = Config.Version;
-                    string v = response.Content.ReadAsStringAsync().Result;
-                    if(v != Config.Version)
+                    var versions = JsonSerializer.Deserialize<List<ConfigApp>>(response.Content.ReadAsStringAsync().Result) ?? new List<ConfigApp>();
+                    var isChanged = false;
+                    foreach(var version in versions)
                     {
-                        //////////////////////////////////////////////////////////////
-                        //update configured software
-                        //////////////////////////////////////////////////////////////
-                        App.Config.Version = Config.Version = v;
+                        var app = Config.Apps.Where(a => a.Name == version.Name).FirstOrDefault();
+                        if(app != null)
+                        {
+                            if (app.Version != version.Version)
+                            {
+                                var oldv = app.Version;
+                                app.Version = version.Version;
+                                isChanged = true;
+                                Update updater = null;
+                                switch (app.Name.ToLower())
+                                {
+                                    case "collector":
+                                        updater = new Updaters.CollectorApp();
+                                        break;
+                                    case "charlotte":
+                                        updater = new Updaters.CharlotteApp();
+                                        break;
+                                    case "charlottes-web":
+                                        updater = new Updaters.CharlottesWebApp();
+                                        break;
+                                }
+                                if (updater != null)
+                                {
+                                    _logger.LogInformation("{time}: running updater for " + app.Name, DateTimeOffset.Now);
+                                    updater.Run();
+                                }
+                                _logger.LogInformation("{time}: Version for \"" + app.Name + "\" changed from " + oldv + " to " + version.Version, DateTimeOffset.Now);
+                            }
+                        }
+                    }
+
+                    if (isChanged)
+                    {
                         //save config file
                         File.WriteAllText(App.MapPath("config.json"), JsonSerializer.Serialize(App.Config, new JsonSerializerOptions()
                         {
                             WriteIndented = true
                         }));
-                        foreach(var app in Config.Apps)
-                        {
-                            Update updater = null;
-                            switch (app.Name.ToLower())
-                            {
-                                case "collector":
-                                    updater = new Updaters.CollectorApp();
-                                    break;
-                                case "charlotte":
-                                    updater = new Updaters.CharlotteApp();
-                                    break;
-                                case "charlottes-web":
-                                    updater = new Updaters.CharlottesWebApp();
-                                    break;
-                            }
-                            if(updater != null)
-                            {
-                                _logger.LogInformation("{time}: running updater for " + app.Name, DateTimeOffset.Now);
-                                updater.Run();
-                            }
-                        }
-
-                        _logger.LogInformation("{time}: Version changed from " + oldv + " to " + v, DateTimeOffset.Now);
                     }
                 }
                 else

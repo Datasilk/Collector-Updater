@@ -6,6 +6,7 @@ namespace Updater
 {
     public class Update: IDisposable
     {
+        /*
         public void Execute(string exe, string args, string path)
         {
             ProcessStartInfo info = new ProcessStartInfo();
@@ -23,6 +24,7 @@ namespace Updater
             fetchProcess.WaitForExit();
             fetchProcess.Close();
         }
+        */
 
         public void Download(string url, string path, string filename)
         {
@@ -47,7 +49,9 @@ namespace Updater
 
         public void DownloadApp(string name)
         {
-            Download(App.Config.Api + $"/releases/{name}/{name}-{App.Config.Version}.zip", App.Config.InstallPath, name + ".zip");
+            var app = App.Config.Apps.Where(a => a.Name == name).FirstOrDefault();
+            if(app == null) { return; }
+            Download(App.Config.Api + $"/releases/{name}/{name}-{app.Version}.zip", App.Config.InstallPath, name + ".zip");
             //extract zip file
             var zip = ZipFile.OpenRead(App.Config.InstallPath + name + ".zip");
             zip.ExtractToDirectory(App.Config.InstallPath + name, true);
