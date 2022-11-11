@@ -25,7 +25,7 @@ namespace Server.Controllers
             var filename = "releases/" + app + "/" + app + "-" + version + ".zip";
             using (var stream = new FileStream(App.MapPath("/wwwroot/" + filename), FileMode.Create))
             {
-                file.CopyToAsync(stream);
+                file.CopyToAsync(stream).Wait();
             }
             try
             {

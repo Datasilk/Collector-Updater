@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="logs\" />
     <Folder Include="wwwroot\releases\collector\" />
     <Folder Include="wwwroot\releases\charlotte\" />
     <Folder Include="wwwroot\releases\charlottes-web\" />

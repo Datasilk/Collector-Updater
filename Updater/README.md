@@ -39,6 +39,9 @@ Each application is actually an ASP.NET Core web application. The application `w
 will be altered to set the application port to the `Port` property defined in **config.json** 
 `Apps` section. Altering `web.config` will trigger IIS to restart the associated application pool.
 
+# Installation
+Publish a release of the Updater service, then run `.\Updater.exe -register` from within Powershell
+
 ## Release An Update
 When you want to release your latest build of Collector, Charlotte, or Charlotte's Web (Router),
 navigate to your Collector Server website (e.g. http://localhost:7005/Upload) and fill out the form.

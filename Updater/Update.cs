@@ -6,26 +6,6 @@ namespace Updater
 {
     public class Update: IDisposable
     {
-        /*
-        public void Execute(string exe, string args, string path)
-        {
-            ProcessStartInfo info = new ProcessStartInfo();
-            info.CreateNoWindow = true;
-            info.RedirectStandardError = true;
-            info.RedirectStandardOutput = true;
-            info.FileName = exe;
-            info.UseShellExecute = false;
-            info.WorkingDirectory = path;
-            info.Arguments = args;
-            Process fetchProcess = new Process();
-            fetchProcess.StartInfo = info;
-            fetchProcess.Start();
-            //output Standard Error and Standard Output here.
-            fetchProcess.WaitForExit();
-            fetchProcess.Close();
-        }
-        */
-
         public void Download(string url, string path, string filename)
         {
             if (!Directory.Exists(path))
