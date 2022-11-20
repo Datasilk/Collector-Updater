@@ -1,0 +1,21 @@
+{
+  "Api": "http://192.168.0.200:7005",
+  "InstallPath": "C:\\Collector\\",
+  "Apps": [
+    {
+      "Name": "collector",
+      "Port": "7070",
+      "Version": "0.1"
+    },
+    {
+      "Name": "charlotte",
+      "Port": "7701",
+      "Version": "0.0"
+    },
+    {
+      "Name": "charlottes-web",
+      "Port": "7700",
+      "Version": "0.1"
+    }
+  ]
+}
