@@ -29,14 +29,17 @@ namespace Updater
 
         public void DownloadApp(string name)
         {
+            Console.WriteLine("Downloading app " + name + "...");
             var app = App.Config.Apps.Where(a => a.Name == name).FirstOrDefault();
             if(app == null) { return; }
             Download(App.Config.Api + $"/releases/{name}/{name}-{app.Version}.zip", App.Config.InstallPath, name + ".zip");
             //extract zip file
+            Console.WriteLine("Extracting zip " + App.Config.InstallPath + name + ".zip to " + App.Config.InstallPath + name + "/");
             var zip = ZipFile.OpenRead(App.Config.InstallPath + name + ".zip");
             zip.ExtractToDirectory(App.Config.InstallPath + name, true);
             //delete zip file
             zip.Dispose();
+            Console.WriteLine("Deleting zip file...");
             File.Delete(App.Config.InstallPath + name + ".zip");
         }
 
