@@ -40,7 +40,11 @@ will be altered to set the application port to the `Port` property defined in **
 `Apps` section. Altering `web.config` will trigger IIS to restart the associated application pool.
 
 # Installation
-Publish a release of the Updater service, then run `.\Updater.exe -register` from within Powershell
+Publish a release of the Updater service, then register the application as a Windows Service
+
+```powershell
+New-Service -Name "Collector Updater" -BinaryPathName "c:\Collector\Updater\Updater.exe" -Description "Software updater for Collector" -DisplayName "Collector Updater" -StartupType Automatic
+```
 
 ## Release An Update
 When you want to release your latest build of Collector, Charlotte, or Charlotte's Web (Router),
