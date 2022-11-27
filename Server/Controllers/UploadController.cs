@@ -9,14 +9,21 @@ namespace Server.Controllers
     {
         public ActionResult Index()
         {
-            return View(new Models.Upload());
+            return RenderView(new Models.Upload());
+        }
+
+        private ActionResult RenderView(Models.Upload upload)
+        {
+            //populate model
+            upload.Versions = App.Config.Apps;
+            return View(upload);
         }
 
         [HttpPost]
         public ActionResult Index([FromForm]Models.UploadForm form)
         {
             if(form == null || form.File == null) { 
-                return View(new Models.Upload() { Error = "No file uploads specified"}); 
+                return RenderView(new Models.Upload() { Error = "No file uploads specified"}); 
             }
             //save file as next app release version zip file in public folder
             var file = form.File;
@@ -38,10 +45,10 @@ namespace Server.Controllers
             }
             catch (Exception ex)
             {
-                return View(new Models.Upload() { Error = ex.Message });
+                return RenderView(new Models.Upload() { Versions = App.Config.Apps, Error = ex.Message });
             }
 
-            return View(new Models.Upload()
+            return RenderView(new Models.Upload()
             {
                 Message = "Uploaded <a href=\"/" + filename + "\" target=\"_blank\">" + filename + "</a> successfully."
             });
