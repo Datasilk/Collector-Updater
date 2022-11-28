@@ -3,17 +3,19 @@ using System.Text.Json;
 using System.Net;
 using System.Net.Http;
 using Updater.Models;
+using Updater.Apps;
 
 namespace Updater
 {
     public class Worker : BackgroundService
     {
-        private readonly ILogger<Worker> _logger;
+        private readonly ILogger<UpdaterLogger> _logger;
         private int Delay { get; set; } = 15; // in minutes
         private string ApiUri { get; set; } = "http://192.168.0.200";
         private Config Config { get; set; } = new Config();
+        private string timeFormat = "hh:mm:ss";
 
-        public Worker(ILogger<Worker> logger)
+        public Worker(ILogger<UpdaterLogger> logger)
         {
             _logger = logger;
 
@@ -24,7 +26,7 @@ namespace Updater
                 App.Config = Config;
                 if(Config.Api == "")
                 {
-                    _logger.LogInformation("{time}: Error getting Api Uri from config.json", DateTimeOffset.Now);
+                    _logger.LogInformation("{time}: Error getting Api Uri from config.json", DateTimeOffset.Now.ToString(timeFormat));
                 }
                 if (!Directory.Exists(App.Config.InstallPath))
                 {
@@ -35,6 +37,10 @@ namespace Updater
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            var startup = true;
+            CollectorApp collectorApp = null;
+            CharlotteApp charlotteApp = null;
+            CharlottesWebApp charlottesWebApp = null;
             while (!stoppingToken.IsCancellationRequested)
             {
                 //check for version update
@@ -46,36 +52,52 @@ namespace Updater
                     var isChanged = false;
                     foreach(var version in versions)
                     {
-                        var app = Config.Apps.Where(a => a.Name == version.Name).FirstOrDefault();
-                        if(app != null)
+                        var appInfo = Config.Apps.Where(a => a.Name == version.Name).FirstOrDefault();
+                        if(appInfo != null)
                         {
-                            if (app.Version != version.Version)
+                            if (appInfo.Version != version.Version || startup == true)
                             {
-                                var oldv = app.Version;
-                                app.Version = version.Version;
+                                var oldv = appInfo.Version;
+                                appInfo.Version = version.Version;
                                 isChanged = true;
-                                Update updater = null;
-                                switch (app.Name.ToLower())
+                                AppBase app = null;
+                                switch (appInfo.Name.ToLower())
                                 {
                                     case "collector":
-                                        updater = new Updaters.CollectorApp();
+                                        if(collectorApp == null) { collectorApp = new CollectorApp(_logger); }
+                                        app = collectorApp;
                                         break;
                                     case "charlotte":
-                                        updater = new Updaters.CharlotteApp();
+                                        if (charlotteApp == null) { charlotteApp = new CharlotteApp(_logger); }
+                                        app = charlotteApp;
                                         break;
                                     case "charlottes-web":
-                                        updater = new Updaters.CharlottesWebApp();
+                                        if (charlottesWebApp == null) { charlottesWebApp = new CharlottesWebApp(_logger); }
+                                        app = charlottesWebApp;
                                         break;
                                 }
-                                if (updater != null)
+                                if (app != null)
                                 {
-                                    _logger.LogInformation("{time}: running updater for " + app.Name, DateTimeOffset.Now);
-                                    updater.Run();
+                                    if (oldv != appInfo.Version)
+                                    {
+                                        //update the application
+                                        _logger.LogInformation("{time}: running updater for " + appInfo.Name, DateTimeOffset.Now.ToString(timeFormat));
+                                        app.Stop(); //stop the app before updating
+                                        app.Update();
+                                        _logger.LogInformation("{time}: Version for \"" + appInfo.Name + "\" changed from " + oldv + " to " + version.Version, DateTimeOffset.Now.ToString(timeFormat));
+                                    }
+                                    if(oldv != appInfo.Version || startup == true)
+                                    {
+                                        //start the application
+                                        _logger.LogInformation("{time}: starting app " + appInfo.Name, DateTimeOffset.Now.ToString(timeFormat));
+                                        app.Start();
+                                    }
                                 }
-                                _logger.LogInformation("{time}: Version for \"" + app.Name + "\" changed from " + oldv + " to " + version.Version, DateTimeOffset.Now);
                             }
                         }
                     }
+
+                    if (startup == true) { startup = false; }
 
                     if (isChanged)
                     {
@@ -88,7 +110,7 @@ namespace Updater
                 }
                 else
                 {
-                    _logger.LogInformation("{time}: Error accessing remote API '" + ApiUri + "'", DateTimeOffset.Now);
+                    _logger.LogInformation("{time}: Error accessing remote API '" + ApiUri + "'", DateTimeOffset.Now.ToString(timeFormat));
                 }
                 await Task.Delay(60000 * Delay, stoppingToken);
             }

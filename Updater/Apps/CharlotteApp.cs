@@ -1,11 +1,16 @@
-﻿namespace Updater.Updaters
+﻿namespace Updater.Apps
 {
-    public class CharlotteApp: Update
+    public class CharlotteApp: AppBase
     {
-        public override void Run()
+        public CharlotteApp(ILogger<UpdaterLogger> logger) : base(logger)
+        {
+            _logger = logger;
+        }
+
+        public override void Update()
         {
             DownloadApp("charlotte");
-            var app = App.Config.Apps.Where(a => a.Name == "charlotte").FirstOrDefault() ?? new Models.ConfigApp() { Port = "7077"};
+            var app = App.Config.Apps.Where(a => a.Name == "charlotte").FirstOrDefault() ?? new Models.ConfigApp() { Address = "localhost:7077"};
 
             //try to register Charlotte as a Windows Service
             try
@@ -17,14 +22,18 @@
             //update appsettings.json with updated port number
             var configfile = App.Config.InstallPath + "charlotte" + "\\appsettings.json";
             var contents = File.ReadAllText(configfile);
-            contents = contents.Replace("7077", app.Port);
+            contents = contents.Replace("localhost:7077", app.Address);
             File.WriteAllText(configfile, contents);
+        }
 
-            //update web.config (which will restart the app)
-            configfile = App.Config.InstallPath + "charlotte" + "\\web.config";
-            contents = File.ReadAllText(configfile);
-            contents = contents.Replace("7077", app.Port);
-            File.WriteAllText(configfile, contents);
+        public override void Start()
+        {
+            StartApp("charlotte", ".\\Charlotte.exe", "Charlotte");
+        }
+
+        public override void Stop()
+        {
+            StopApp();
         }
     }
 }
