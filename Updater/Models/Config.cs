@@ -10,8 +10,13 @@
     public class ConfigApp
     {
         public string Name { get; set; } = "";
-        public string Port { get; set; } = "";
-        public string Address { get; set; } = "";
+        public List<ConfigReplaceFile> Replace { get; set; } = new List<ConfigReplaceFile>();
         public string Version { get; set; } = "";
+    }
+
+    public class ConfigReplaceFile
+    {
+        public string File { get; set; } = "";
+        public string With { get; set; } = "";
     }
 }

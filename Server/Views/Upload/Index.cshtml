@@ -63,7 +63,7 @@
                     <div class="row">
                         <div class="col field">App</div>
                         <div class="col input">
-                            <select name="App">
+                            <select name="App" id="update_app" oninput="changeApp()">
                                 <option value="collector">Collector</option>
                                 <option value="charlotte">Charlotte</option>
                                 <option value="charlottes-web">Charlotte's Web</option>
@@ -72,7 +72,7 @@
                     </div>
                     <div class="row">
                         <div class="col field">Version</div>
-                        <div class="col input"><input type="text" name="Version" value="1.0" style="width:75px" /></div>
+                        <div class="col input"><input type="text" id="update_version" name="Version" value="1.0" style="width:75px" /></div>
                     </div>
                     <div class="row">
                         <div class="col field"></div>
@@ -84,9 +84,24 @@
     </body>
 
     <script>
-        function upload() {
-            document.getElementsByClassName('upload-form')[0].style.height = '0px';
+        var apps = {};
+        @foreach(var version in Model.Versions)
+        {
+            @Html.Raw($"apps['{version.Name}'] = {{version:\"{version.Version}\"}};");
         }
+
+        function upload() {
+            setTimeout(() => {
+                var form = document.getElementsByClassName('uploadbtn')[0];
+                form.style.display = "none";
+            }, 100);
+        }
+
+        function changeApp(){
+            update_version.value = apps[update_app.value].version;
+        }
+
+        changeApp();
     </script>
 </html>
 

@@ -8,6 +8,7 @@ builder.Services.Configure<FormOptions>(options =>
     options.MultipartBodyLengthLimit = 1024 * 1024 * 1024;
 });
 
+builder.Services.AddRouting();
 builder.Services.AddControllers();
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 var app = builder.Build();
@@ -18,6 +19,10 @@ Server.App.Config = JsonSerializer.Deserialize<Server.Models.Config>(config) ?? 
 app.UseStaticFiles();
 app.UseAuthorization();
 app.MapControllers();
-app.MapRazorPages();
+app.UseRouting();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapRazorPages();
+});
 
 app.Run();

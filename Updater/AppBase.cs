@@ -55,6 +55,14 @@ namespace Updater
             File.Delete(App.Config.InstallPath + name + ".zip");
         }
 
+        public void ReplaceFiles(List<Models.ConfigReplaceFile> files, string appName)
+        {
+            foreach(var file in files)
+            {
+                File.Copy(App.MapPath(file.With), App.Config.InstallPath + appName + "/" + file.File, true);
+            }
+        }
+
         #region "PowerShell"
 
         private PowerShell ps { get; set; } = PowerShell.Create();

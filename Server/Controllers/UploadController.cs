@@ -4,19 +4,20 @@ using Microsoft.AspNetCore.Mvc;
 namespace Server.Controllers
 {
     [Controller]
+    [Route("/")]
     [Route("Upload")]
     public class UploadController : Controller
     {
-        public ActionResult Index()
-        {
-            return RenderView(new Models.Upload());
-        }
-
         private ActionResult RenderView(Models.Upload upload)
         {
             //populate model
             upload.Versions = App.Config.Apps;
             return View(upload);
+        }
+
+        public ActionResult Index()
+        {
+            return RenderView(new Models.Upload());
         }
 
         [HttpPost]
